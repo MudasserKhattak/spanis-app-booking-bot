@@ -1,0 +1,30 @@
+services:
+  spanish-bot-vnc:
+    build: .
+    container_name: spanish-appointment-bot-vnc
+    environment:
+      - DISPLAY=:1
+      - PYTHONUNBUFFERED=1
+      - CHROME_DRIVER_PATH=/usr/local/bin/chromedriver
+      - ANTICAPTCHA_API_KEY=${ANTICAPTCHA_API_KEY:-}
+      - SMS_WEBHOOK_TOKEN=${SMS_WEBHOOK_TOKEN:-}
+    volumes:
+      - ./my_config.py:/app/my_config.py:ro
+      - ./artifacts:/app/artifacts
+    ports:
+      - "5900:5900"  # VNC port
+      - "6080:6080"  # noVNC web interface
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    command: /bin/bash -c "
+      echo 'Starting VNC server...';
+      Xvfb :1 -screen 0 1280x720x24 &
+      sleep 2;
+      x11vnc -display :1 -nopw -listen 0.0.0.0 -xkb -rfbport 5900 -shared -forever &
+      sleep 3;
+      echo 'VNC server started on :5900';
+      echo 'Connect with VNC client to localhost:5900';
+      echo 'Starting bot...';
+      python my_config.py || bash
+    "
