@@ -32,8 +32,45 @@ Provinces:
 
 Other provinces are also supported if you leave `offices` empty and that way try and get an appointment in a random office, but if you're required to select a specific office (as in case of `OperationType.RECOGIDA_DE_TARJETA`), you should figure out office ids for your province from the appropriate page on your own.
 
-Installation TL;DR
--------------------
+Installation
+------------
+
+### Option 1: Docker (Recommended) 🐳
+
+The easiest way to run the bot is using Docker, which handles all dependencies automatically:
+
+1. **Install Docker and Docker Compose** on your system
+   - [Docker Desktop](https://www.docker.com/products/docker-desktop) (Windows/Mac)
+   - [Docker Engine](https://docs.docker.com/engine/install/) (Linux)
+
+2. **Clone and setup**
+   ```bash
+   git clone <this-repository>
+   cd spanis-app-booking-bot
+   ```
+
+3. **Create your configuration**
+   ```bash
+   cp my_config.py.example my_config.py
+   # Edit my_config.py with your personal data
+   ```
+
+4. **Create artifacts directory**
+   ```bash
+   mkdir -p artifacts
+   ```
+
+5. **Run the bot**
+   ```bash
+   # Build and run
+   docker-compose run --rm spanish-bot python my_config.py
+   
+   # Or run one of the examples
+   docker-compose run --rm spanish-bot python example1.py
+   docker-compose run --rm spanish-bot python example2.py
+   ```
+
+### Option 2: Traditional Installation
 
 1. Install [Python 3.10](https://www.python.org/downloads/release/python-3100/).
 
@@ -48,6 +85,42 @@ Installation TL;DR
 5. Copy example file and fill your data, save it as `grab_me.py`.
 
 6. Run `python grab_me.py` or `python3 grab_me.py`, follow the voice instructions.
+
+### Docker Environment Variables
+
+For enhanced automation with Docker, create a `.env` file:
+
+```bash
+# Copy example environment file
+cp .env.example .env
+# Edit .env with your API keys
+```
+
+Example `.env` content:
+```env
+ANTICAPTCHA_API_KEY=your_anticaptcha_api_key_here
+SMS_WEBHOOK_TOKEN=your_webhook_token_here
+```
+
+### Docker Advanced Usage
+
+```bash
+# Development mode with live code editing
+docker-compose --profile dev run --rm spanish-bot-dev python my_config.py
+
+# Run with custom environment variables
+ANTICAPTCHA_API_KEY=your_key docker-compose run --rm spanish-bot python my_config.py
+
+# Interactive shell access
+docker-compose run --rm spanish-bot bash
+
+# View artifacts (screenshots, logs)
+ls -la artifacts/
+
+# Clean up
+docker-compose down
+docker image prune
+```
 
 ### Optional steps for automation:
 
@@ -136,6 +209,38 @@ class CustomerProfile:
 
 Troubleshooting
 ---------------
+
+### Docker Issues
+
+**Container won't start:**
+```bash
+# Check Docker is running
+docker version
+
+# Rebuild container if needed
+docker-compose build --no-cache
+```
+
+**Chrome/Audio issues in container:**
+```bash
+# Check Chrome installation
+docker-compose run --rm spanish-bot google-chrome --version
+
+# Test audio system
+docker-compose run --rm spanish-bot espeak "test"
+```
+
+**Permission issues with artifacts:**
+```bash
+# Fix artifacts directory permissions
+sudo chown -R $USER:$USER artifacts/
+chmod 755 artifacts/
+```
+
+**No sound from container:**
+Audio notifications work inside the container but may not play on the host system. This is normal for Docker containers.
+
+### General Issues
 
 For Windows, escape paths with additional backslash, e.g. `C:\\Users\\lehne`
 

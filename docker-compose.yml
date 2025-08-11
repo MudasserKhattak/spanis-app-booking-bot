@@ -1,0 +1,44 @@
+services:
+  spanish-bot:
+    build: .
+    container_name: spanish-appointment-bot
+    environment:
+      # Display for headless browser
+      - DISPLAY=:99
+      # Python settings
+      - PYTHONUNBUFFERED=1
+      # Chrome settings for container
+      - CHROME_DRIVER_PATH=/usr/local/bin/chromedriver
+      # Optional: Anti-captcha API key (set via .env file)
+      - ANTICAPTCHA_API_KEY=${ANTICAPTCHA_API_KEY:-}
+      # Optional: SMS webhook token (set via .env file)
+      - SMS_WEBHOOK_TOKEN=${SMS_WEBHOOK_TOKEN:-}
+    volumes:
+      # Mount your custom configuration files
+      - ./my_config.py:/app/my_config.py:ro
+      # Mount artifacts directory for screenshots and logs
+      - ./artifacts:/app/artifacts
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    # Uncomment the next line if you want to run a specific script automatically
+    # command: python my_config.py
+    
+  # Optional: Development version with volume mount for live editing
+  spanish-bot-dev:
+    build: .
+    container_name: spanish-appointment-bot-dev
+    environment:
+      - DISPLAY=:99
+      - PYTHONUNBUFFERED=1
+      - CHROME_DRIVER_PATH=/usr/local/bin/chromedriver
+      - ANTICAPTCHA_API_KEY=${ANTICAPTCHA_API_KEY:-}
+      - SMS_WEBHOOK_TOKEN=${SMS_WEBHOOK_TOKEN:-}
+    volumes:
+      # Mount entire source for development
+      - .:/app
+      - ./artifacts:/app/artifacts
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    profiles: ["dev"]
